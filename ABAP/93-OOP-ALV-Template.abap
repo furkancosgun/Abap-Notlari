@@ -46,11 +46,6 @@ CLASS cls_report IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD prepare_display.
-    CREATE OBJECT alv_grid
-      EXPORTING
-        i_parent = cl_gui_custom_container=>screen0
-      EXCEPTIONS
-        OTHERS   = 0.
 
     CLEAR layout.
     layout-zebra      = 'X'.
@@ -70,35 +65,44 @@ CLASS cls_report IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD display_alv.
-    SET HANDLER me->handle_double_click FOR alv_grid.
-    CALL METHOD alv_grid->set_table_for_first_display
-      EXPORTING
-        is_layout                     = layout
-        i_save                        = 'A'
-        i_default                     = 'X'
-        is_variant                    = variant
-      CHANGING
-        it_outtab                     = gt_alv_tab
-        it_fieldcatalog               = fieldcat
-      EXCEPTIONS
-        invalid_parameter_combination = 1
-        program_error                 = 2
-        too_many_lines                = 3
-        OTHERS                        = 4.
-    IF sy-subrc IS INITIAL.
-      CALL METHOD alv_grid->register_edit_event
+    IF alv_grid IS INITIAL .
+      CREATE OBJECT alv_grid
         EXPORTING
-          i_event_id = cl_gui_alv_grid=>mc_evt_modified
+          i_parent = cl_gui_custom_container=>screen0
         EXCEPTIONS
-          error      = 1
-          OTHERS     = 2.
+          OTHERS   = 0.
+      SET HANDLER me->handle_double_click FOR alv_grid.
+      CALL METHOD alv_grid->set_table_for_first_display
+        EXPORTING
+          is_layout                     = layout
+          i_save                        = 'A'
+          i_default                     = 'X'
+          is_variant                    = variant
+        CHANGING
+          it_outtab                     = gt_alv_tab
+          it_fieldcatalog               = fieldcat
+        EXCEPTIONS
+          invalid_parameter_combination = 1
+          program_error                 = 2
+          too_many_lines                = 3
+          OTHERS                        = 4.
+      IF sy-subrc IS INITIAL.
+        CALL METHOD alv_grid->register_edit_event
+          EXPORTING
+            i_event_id = cl_gui_alv_grid=>mc_evt_modified
+          EXCEPTIONS
+            error      = 1
+            OTHERS     = 2.
 
-      CALL METHOD alv_grid->register_edit_event
-        EXPORTING
-          i_event_id = cl_gui_alv_grid=>mc_evt_enter
-        EXCEPTIONS
-          error      = 1
-          OTHERS     = 2.
+        CALL METHOD alv_grid->register_edit_event
+          EXPORTING
+            i_event_id = cl_gui_alv_grid=>mc_evt_enter
+          EXCEPTIONS
+            error      = 1
+            OTHERS     = 2.
+      ENDIF.
+    ELSE.
+      CALL METHOD alv_grid->refresh_table_display( ).
     ENDIF.
   ENDMETHOD.
 ENDCLASS.
