@@ -1,22 +1,110 @@
 *&---------------------------------------------------------------------*
-*&  Include           ZFC_EXAMPLE_TOP
+*&  Include           ZFC_DEMO_REPORT_TEMPLATE_TOP
 *&---------------------------------------------------------------------*
-
 CLASS cls_report DEFINITION DEFERRED.
 TABLES:scarr.
 DATA: go_report  TYPE REF TO cls_report,
       gt_alv_tab TYPE TABLE OF scarr.
+DATA: alv_grid TYPE REF TO cl_gui_alv_grid.
 "///////////////////////////////////////////////////////////////////////
 *&---------------------------------------------------------------------*
-*&  Include           ZFC_EXAMPLE_SLC
+*&  Include           ZFC_DEMO_REPORT_TEMPLATE_SLC
 *&---------------------------------------------------------------------*
 SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-000.
 PARAMETERS p_carrid TYPE scarr-carrid.
 SELECTION-SCREEN END OF BLOCK b1.
 "///////////////////////////////////////////////////////////////////////
 *&---------------------------------------------------------------------*
-*&  Include           ZFC_EXAMPLE_CLS
-*&---------------------------------------------------------------------**&---------------------------------------------------------------------*
+*&  Include           ZFC_DEMO_REPORT_TEMPLATE_EVT
+*&---------------------------------------------------------------------*
+CLASS cls_events DEFINITION .
+  PROTECTED SECTION.
+    METHODS  handle_top_of_page
+        FOR EVENT top_of_page OF cl_gui_alv_grid
+      IMPORTING
+        e_dyndoc_id
+        table_index.
+
+
+    METHODS handle_hotspot_click
+        FOR EVENT hotspot_click OF cl_gui_alv_grid
+      IMPORTING
+        e_row_id
+        e_column_id.
+
+    METHODS handle_double_click
+        FOR EVENT double_click OF cl_gui_alv_grid
+      IMPORTING
+        e_row
+        e_column
+        es_row_no.
+
+    METHODS handle_data_changed
+        FOR EVENT data_changed OF cl_gui_alv_grid
+      IMPORTING
+        er_data_changed
+        e_onf4
+        e_onf4_before
+        e_onf4_after
+        e_ucomm.
+
+    METHODS handle_button_click
+        FOR EVENT button_click OF cl_gui_alv_grid
+      IMPORTING
+        es_col_id
+        es_row_no.
+
+    METHODS handle_onf4
+        FOR EVENT onf4 OF cl_gui_alv_grid
+      IMPORTING
+        e_fieldname
+        e_fieldvalue
+        es_row_no
+        er_event_data
+        et_bad_cells
+        e_display.
+
+    METHODS: handle_toolbar
+        FOR EVENT toolbar OF cl_gui_alv_grid
+      IMPORTING
+        e_object
+        e_interactive.
+
+    METHODS: handle_user_command
+        FOR EVENT user_command OF cl_gui_alv_grid
+      IMPORTING
+        e_ucomm.
+
+ENDCLASS.
+
+CLASS cls_events IMPLEMENTATION.
+  METHOD handle_top_of_page.
+  ENDMETHOD.
+
+  METHOD handle_hotspot_click.
+  ENDMETHOD.
+
+  METHOD handle_double_click.
+    DELETE gt_alv_tab INDEX es_row_no-row_id.
+    alv_grid->refresh_table_display( ).
+  ENDMETHOD.
+
+  METHOD handle_data_changed.
+  ENDMETHOD.
+
+  METHOD handle_button_click.
+  ENDMETHOD.
+
+  METHOD handle_onf4.
+  ENDMETHOD.
+
+  METHOD handle_toolbar.
+  ENDMETHOD.
+
+  METHOD handle_user_command.
+  ENDMETHOD.
+ENDCLASS.
+*&---------------------------------------------------------------------*
 *&  Include           ZFC_DEMO_REPORT_TEMPLATE_CLS
 *&---------------------------------------------------------------------*
 CLASS cls_report DEFINITION INHERITING FROM cls_events.
@@ -25,8 +113,7 @@ CLASS cls_report DEFINITION INHERITING FROM cls_events.
 
   PRIVATE SECTION.
     CONSTANTS: lc_alv_structre TYPE dd02l-tabname VALUE 'SCARR'.
-    DATA: alv_grid TYPE REF TO cl_gui_alv_grid,
-          layout   TYPE lvc_s_layo,
+    DATA: layout   TYPE lvc_s_layo,
           fieldcat TYPE lvc_t_fcat,
           variant  TYPE disvariant.
 
@@ -105,94 +192,7 @@ CLASS cls_report IMPLEMENTATION.
       CALL METHOD alv_grid->refresh_table_display( ).
     ENDIF.
   ENDMETHOD.
-ENDCLASS.
-*&---------------------------------------------------------------------*
-*&  Include           ZFC_DEMO_REPORT_TEMPLATE_EVT
-*&---------------------------------------------------------------------*
-CLASS cls_events DEFINITION .
-  PROTECTED SECTION.
-    METHODS  handle_top_of_page
-        FOR EVENT top_of_page OF cl_gui_alv_grid
-      IMPORTING
-        e_dyndoc_id
-        table_index.
 
-
-    METHODS handle_hotspot_click
-        FOR EVENT hotspot_click OF cl_gui_alv_grid
-      IMPORTING
-        e_row_id
-        e_column_id.
-
-    METHODS handle_double_click
-        FOR EVENT double_click OF cl_gui_alv_grid
-      IMPORTING
-        e_row
-        e_column
-        es_row_no.
-
-    METHODS handle_data_changed
-        FOR EVENT data_changed OF cl_gui_alv_grid
-      IMPORTING
-        er_data_changed
-        e_onf4
-        e_onf4_before
-        e_onf4_after
-        e_ucomm.
-
-    METHODS handle_button_click
-        FOR EVENT button_click OF cl_gui_alv_grid
-      IMPORTING
-        es_col_id
-        es_row_no.
-
-    METHODS handle_onf4
-        FOR EVENT onf4 OF cl_gui_alv_grid
-      IMPORTING
-        e_fieldname
-        e_fieldvalue
-        es_row_no
-        er_event_data
-        et_bad_cells
-        e_display.
-
-    METHODS: handle_toolbar
-        FOR EVENT toolbar OF cl_gui_alv_grid
-      IMPORTING
-        e_object
-        e_interactive.
-
-    METHODS: handle_user_command
-        FOR EVENT user_command OF cl_gui_alv_grid
-      IMPORTING
-        e_ucomm.
-
-ENDCLASS.
-
-CLASS cls_events IMPLEMENTATION.
-  METHOD handle_top_of_page.
-  ENDMETHOD.
-
-  METHOD handle_hotspot_click.
-  ENDMETHOD.
-
-  METHOD handle_double_click.
-  ENDMETHOD.
-
-  METHOD handle_data_changed.
-  ENDMETHOD.
-
-  METHOD handle_button_click.
-  ENDMETHOD.
-
-  METHOD handle_onf4.
-  ENDMETHOD.
-
-  METHOD handle_toolbar.
-  ENDMETHOD.
-
-  METHOD handle_user_command.
-  ENDMETHOD.
 ENDCLASS.
 "///////////////////////////////////////////////////////////////////////
 *&---------------------------------------------------------------------*
