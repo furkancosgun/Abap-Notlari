@@ -55,6 +55,7 @@ REPORT zfc_exp_mvc.
 CLASS cls_model DEFINITION.
   PUBLIC SECTION.
     INTERFACES  zif_report_model.
+  PRIVATE SECTION.
     DATA :mt_table TYPE TABLE OF scarr.
 ENDCLASS.
 CLASS cls_model IMPLEMENTATION .
@@ -148,6 +149,7 @@ ENDCLASS.
 CLASS cls_controller DEFINITION.
   PUBLIC SECTION.
     INTERFACES zif_report_controller.
+  PRIVATE SECTION.
     DATA mo_model TYPE REF TO zif_report_model.
     DATA mo_view TYPE REF TO zif_report_view.
 ENDCLASS.
