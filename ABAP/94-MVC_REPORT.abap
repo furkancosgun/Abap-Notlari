@@ -166,11 +166,13 @@ ENDCLASS.
 CLASS cls_controller IMPLEMENTATION.
   METHOD zif_report_controller~set_model.
     mo_model = io_model.
+    mr_table = mo_model->get_output_data( ).
   ENDMETHOD.
   METHOD zif_report_controller~handle_double_click.
-    mr_table = mo_model->get_output_data( ).
     FIELD-SYMBOLS: <fs_table> TYPE STANDARD TABLE.
+
     ASSIGN mr_table->* TO <fs_table>.
+
     DELETE <fs_table> INDEX 1.
     mo_view->refresh_table_display( ).
   ENDMETHOD.
