@@ -161,19 +161,12 @@ CLASS cls_controller DEFINITION.
   PRIVATE SECTION.
     DATA mo_model TYPE REF TO zif_report_model.
     DATA mo_view TYPE REF TO zif_report_view.
-    DATA mr_table TYPE REF TO data.
 ENDCLASS.
 CLASS cls_controller IMPLEMENTATION.
   METHOD zif_report_controller~set_model.
     mo_model = io_model.
-    mr_table = mo_model->get_output_data( ).
   ENDMETHOD.
   METHOD zif_report_controller~handle_double_click.
-    FIELD-SYMBOLS: <fs_table> TYPE STANDARD TABLE.
-
-    ASSIGN mr_table->* TO <fs_table>.
-
-    DELETE <fs_table> INDEX 1.
     mo_view->refresh_table_display( ).
   ENDMETHOD.
   METHOD zif_report_controller~set_view.
