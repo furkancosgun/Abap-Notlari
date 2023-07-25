@@ -30,7 +30,15 @@ INTERFACE zif_report_controller
   METHODS: handle_user_command FOR EVENT user_command OF cl_gui_alv_grid IMPORTING e_ucomm.
 ENDINTERFACE.
 
-"REPORT
+"APP INTERFACE
+INTERFACE zif_report_app
+  PUBLIC .
+  METHODS:initialization.
+  METHODS:start_of_selection.
+  METHODS:end_of_selection.
+ENDINTERFACE.
+
+"""EXAMPLE REPORT"""
 
 "MODEL
 *&---------------------------------------------------------------------*
@@ -102,7 +110,7 @@ CLASS cls_view IMPLEMENTATION .
       EXCEPTIONS
         OTHERS   = 0.
 
-    SET HANDLER mo_controller->handle_double_click FOR mo_alv_grid.
+    SET HANDLER mo_controller->handle_double_click FOR mo_alv_grid."IF NEED
 
     CALL METHOD mo_alv_grid->set_table_for_first_display
       EXPORTING
@@ -158,7 +166,6 @@ ENDCLASS.
 CLASS cls_controller IMPLEMENTATION.
   METHOD zif_report_controller~set_model.
     mo_model = io_model.
-
   ENDMETHOD.
   METHOD zif_report_controller~handle_double_click.
     mr_table = mo_model->get_output_data( ).
@@ -176,27 +183,40 @@ ENDCLASS.
 *&---------------------------------------------------------------------*
 *&  Include           ZFC_REPORT_MVC_APP
 *&---------------------------------------------------------------------*
+CLASS cls_app DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES:zif_report_app.
+  PRIVATE SECTION.
+    DATA :mo_model      TYPE REF TO zif_report_model.
+    DATA :mo_view       TYPE REF TO zif_report_view.
+    DATA :mo_controller TYPE REF TO zif_report_controller.
+ENDCLASS.
+CLASS cls_app IMPLEMENTATION.
+  METHOD:zif_report_app~initialization.
+    mo_model      = NEW cls_model( ).
+    mo_view       = NEW cls_view( ).
+    mo_controller = NEW cls_controller( ).
+  ENDMETHOD.
+  METHOD:zif_report_app~start_of_selection.
+    mo_model->get_data( ).
+  ENDMETHOD.
+  METHOD:zif_report_app~end_of_selection.
+    mo_view->set_model( io_model = mo_model ).
+    mo_view->set_controller( io_controller = mo_controller ).
 
-INITIALIZATION.
-  DATA(lo_model) = NEW cls_model( ).
-  DATA(lo_view) = NEW cls_view( ).
-  DATA(lo_controller) = NEW cls_controller( ).
+    mo_controller->set_model( io_model = mo_model ).
+    mo_controller->set_view( io_view = mo_view ).
 
-START-OF-SELECTION.
-  lo_model->zif_report_model~get_data( ).
+    mo_view->prepare_display( ).
+    mo_view->display( ).
+  ENDMETHOD.
+ENDCLASS.
 
-END-OF-SELECTION.
-  lo_view->zif_report_view~set_model( io_model = lo_model ).
-  lo_view->zif_report_view~set_controller( io_controller = lo_controller ).
-
-  lo_controller->zif_report_controller~set_model( io_model = lo_model ).
-  lo_controller->zif_report_controller~set_view( io_view = lo_view ).
-
-  lo_view->zif_report_view~display( ).
+"BASE
 *&---------------------------------------------------------------------*
 *& Report ZFC_REPORT_MVC
 *&---------------------------------------------------------------------*
-*&
+*& CREATED BY FURKAN COSGUN
 *&---------------------------------------------------------------------*
 REPORT zfc_report_mvc.
 INCLUDE  zfc_report_mvc_model.
@@ -204,3 +224,16 @@ INCLUDE  zfc_report_mvc_view.
 INCLUDE  zfc_report_mvc_controller.
 INCLUDE  zfc_report_mvc_app.
 
+DATA app TYPE REF TO zif_report_app.
+
+LOAD-OF-PROGRAM.
+  app = NEW cls_app( ).
+
+INITIALIZATION.
+  app->initialization( ).
+
+START-OF-SELECTION.
+  app->start_of_selection( ).
+
+END-OF-SELECTION.
+  app->end_of_selection( ).
