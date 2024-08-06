@@ -1,41 +1,36 @@
-parameters: p_num1 type i. "int turunde 10 basamaklı input istedim
+" Parameters: p_num1 - integer type, input accepts 10 digits
+PARAMETERS: p_num1 TYPE i. " int türünde 10 basamaklı input istedim
 
-"git->metin_sembolleri->selection_text-> inputtaki yazıyı değiştirebiliriz
+" Git->metin_sembolleri->selection_text: Inputtaki yazıyı değiştirebiliriz
 
-parameters: p_num1 type i,
-            p_num2 type DATAELEMENT."verirsek o dataelement tipinde veri alcak durumda kendini ayarlar
-	
+PARAMETERS: p_num2 TYPE i,
+            p_num3 TYPE c. " Data element türünde veri alacak şekilde ayarlanır
 
-select-options: s_per_soy for data.//iki deger arasında/dışında secim hakkı verir 
+" Select-options: iki değer arasında/dışında seçim hakkı verir
+SELECT-OPTIONS: s_person FOR data. " İki değer arasında veya dışında seçim hakkı verir
 
+" Tables: Raporun tabloyu tanımadığı durumlarda rapora tabloyu tanıtma işlemi yapılır
+TABLES: databaseTableName. " Raporun tabloyu tanımadığı zamanlarda rapora tanıtma işlemi yapılır
 
-"Tables: veritabanıTabloAdı."Raporun tabloyu tanımadıgı zamanlarda rapora tanıtma işlemini yapar
+" Select-options: Tablonun belirli bir kolonunu referans alır
+SELECT-OPTIONS: s_col FOR tableName-columnName. " Bu tablonun bu kolonunu referans al demek oluyor
 
-select-options: s_per_ad for tableAd-kolonAdı."bu tablonun bu kolonunu referans al demek oluyor
+" Checkbox
+PARAMETERS: p_chk AS CHECKBOX. " Checkbox tanımlama
 
-"CHECHBOX
-parameters: p_cbox1 as checkbox.
-			
-"RadioButton
-parameters: p_radi as radiobutton group grp1,
-            p_radi2 radiobutton group grp1.
+" RadioButton
+PARAMETERS: p_rad1 AS RADIOBUTTON GROUP grp1,
+            p_rad2 AS RADIOBUTTON GROUP grp1. " Radio buttonlar aynı grup içinde
 
+" SelectionScreen: Bir panel oluşturup içine parametreler veya selection screen ekleyebiliriz, tasarım açısından daha hoş durması için
+SELECTION-SCREEN: BEGIN OF BLOCK b1 WITH FRAME.
 
-"selectionScreen "Bir panel oluşturup onun içine parametreleri veya selection screenleri ekleyebilirz,tasarım açısından daha hoş durması için
+" Parameters or texts all views
+SELECTION-SCREEN: END OF BLOCK b1.
 
-selection-Screen begin of block bl1 with frame.
+" Panele başlık verme
+SELECTION-SCREEN: BEGIN OF BLOCK b1 WITH FRAME TITLE 'Başlık'.
 
-"parameters or texts all views
+PARAMETERS: lv_name TYPE string.
 
-selection-Screen end of block bl1.
-
-"Panele başlık verme
-"selection-Screen begin of block bl1 with frame title text-id.
-
-SELECTION-SCREEN: BEGIN OF BLOCK b1  WITH FRAME TITLE Başlik .
-
-PARAMETERS: lv_ad type string.
-
-SELECTION-SCREEN : END OF BLOCK b1.
-
-
+SELECTION-SCREEN: END OF BLOCK b1.
