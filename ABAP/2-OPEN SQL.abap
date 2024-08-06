@@ -1,41 +1,34 @@
-"Domain nedir: Teknik yapısal ozellikler bulunur
-"Data element nedir:Daha anımsal ozellikler bulunur veri tipi vs
+" Domain nedir: Teknik yapısal özellikler bulunur
+" Data element nedir: Daha anlamsal özellikler bulunur, veri tipi vs.
 
+" Variable oluşturma
+DATA: gv_person_id TYPE int4,    " ID veri elemanı
+      gv_person_name TYPE char30,  " Ad veri elemanı
+      gv_person_surname TYPE char30, " Soyad veri elemanı
+      gv_person_gender TYPE char1,  " Cinsiyet veri elemanı
+      gs_person TYPE TableName,           " Structure tanımlama (n kolonu referans alır)
+      gt_person TYPE TABLE OF TableName. " Tablo tanımlama
 
-"Variable oluşturma
+" Verileri tabloya seçme
+SELECT * FROM tableName INTO TABLE gt_person.
 
-data: gv_per_id type dataElementName,
-	gv_per_ad type dataElementName,
-	gv_per_soyad type dataElementName,
-	gv_per_cins type dataElementName,
-	gs_per_t type TableName,"Structure tanımlama(n kolonu referans alır)
-	gt_per_t type table of table_name."Tablo tanımlama
-	
+" Structure: Tabloların tek bir satırını tutan yapı
+" Structure verilerini tutma
+SELECT SINGLE * FROM tableName INTO gs_person.
 
-select * from tableName into table gt_per_t .
+" Tek bir sütunu almak
+SELECT SINGLE tableColumnName FROM tableName INTO columnValue.
 
-"Structure : Tabloların tek bir satırını tutan yapı
-"Structure tutmak
+" Where yapısı ile veri seçme
+SELECT SINGLE * FROM tableName INTO gs_person WHERE columnName EQ value.
 
-select single * from tableName into gs_per_t.
+" Structure veri eklemek
+gs_person-columnName = 3.
+gs_person-columnName = 'furkan'.
 
+" Veriyi tabloya ekleme
+INSERT tableName FROM gs_person.
 
-"Tek bir sutunu almak
-select single tableKolonAd tableName into kolonGelenVeri.
-
-
-"Where yapısı
-select single * from tableName into gs_per_t where kolonAd EQ deger.
-
-"Structra veri  eklemek
-gs_per_t-kolonAd = 3.
-gs_per_t-kolonAd = 'furkan'.
-
-"
-insert tableName from gs_per_t
-
-"Update ve delte komutu normal sql komutu ile aynıdır.
-
-"Modify komutu o structure içindeki key e sahip bi deger varsa update yapar yoksa insert işlemi yapar
-modify tableName from gs_per_t.
-	
+" Update ve delete komutları normal SQL komutları ile aynıdır
+" Modify komutu: Eğer structure içindeki key'e sahip bir değer varsa update yapar, yoksa insert işlemi yapar
+MODIFY tableName FROM gs_person.
