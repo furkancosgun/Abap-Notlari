@@ -5,154 +5,119 @@
 *&---------------------------------------------------------------------*
 REPORT ZFC_ALV_SALV_KULLANIM.
 
-"En basit şekilde"
-*
-*oluşturma"
-*DATA: gt_sbook type TABLE OF sbook, "intern table"
-*      go_salv type REF TO cl_salv_table. "salv objesi"
-*
-*START-OF-SELECTION.
-*
-*select * UP TO 20 rows from sbook
-*  INTO TABLE gt_sbook. "query"
-*
-*baglama"
-*
-*SALV fonksionu oluşturma"
-*cl_salv_table=>FACTORY(
-*  importing
-*    R_SALV_TABLE   =    go_salv
-*  changing
-*    T_TABLE        =    gt_sbook
-*).
-*Salv yapsıı kullanılmadan once oluşturulur baglanır ve goruntulenir
-*
-*gpruntuleme"
-*GO_SALV->DISPLAY( ).
-
-
-
-"Geliştirilmiş"
-"oluşturma"
-DATA: gt_sbook type TABLE OF sbook, "intern table"
-      go_salv type REF TO cl_salv_table. "salv objesi"
+" Veri tanımları
+DATA: gt_sbook TYPE TABLE OF sbook, " İç tablo (intern table) veri tutar
+      go_salv TYPE REF TO cl_salv_table. " SALV nesnesinin referansı
 
 START-OF-SELECTION.
 
-select * UP TO 20 rows from sbook
-  INTO TABLE gt_sbook. "query"
+  " Veriyi seçme
+  SELECT * UP TO 20 ROWS FROM sbook
+    INTO TABLE gt_sbook. " Verileri iç tabloya al
 
-"baglama"
+  " SALV fonksiyonu oluşturma
+  cl_salv_table=>factory(
+    IMPORTING
+      r_salv_table = go_salv " SALV nesnesini oluşturur
+    CHANGING
+      t_table      = gt_sbook " İç tabloyu SALV nesnesine bağlar
+  ).
 
-"SALV fonksionu oluşturma"
-cl_salv_table=>FACTORY(
-  importing
-    R_SALV_TABLE   =    go_salv
-  changing
-    T_TABLE        =    gt_sbook
-).
-"Salv yapsıı kullanılmadan once oluşturulur baglanır ve goruntulenir
+  " Ekran işlemleri
+  " SALV nesnesinin ekran ayarlarını tutan değişken oluşturulur
+  DATA: lo_display TYPE REF TO cl_salv_display_settings.
 
-"Ekran işlemleri
-"lo_display adında salv objesinin ekran ayarlarını tutan değişken oluşturulur düzenlemeler yapabilmek için"
-DATA:  lo_display TYPE REF TO CL_SALV_DISPLAY_SETTINGS.
+  " Oluşturulan objeye SALV nesnesinin ekran ayarları atanır
+  lo_display = go_salv->get_display_settings( ).
 
-"oluşturulan objeye kullandigimiz salv objesinin display ayarları atanır
-lo_display = GO_SALV->GET_DISPLAY_SETTINGS( ).
+  " Ekran üzerindeki liste başlığını değiştirme
+  lo_display->set_list_header( VALUE = 'SALV Kullanımı' ).
 
-"Ekran uzerindeki liste başlıgını değiştirme"
-LO_DISPLAY->SET_LIST_HEADER( VALUE =  'SALV Kullanımı').
+  " Listenin satırlarının zebra desenli olmasını sağlar
+  lo_display->set_striped_pattern( VALUE = 'X' ).
 
-"Listenin satırlarının zebra desenli olmasını saglar
-LO_DISPLAY->SET_STRIPED_PATTERN( VALUE =  'X').
+  " Genel Kolon işlemleri
+  " Kolonlara erişmek için SALV sınıfından obje üretilir
+  DATA: lo_cols TYPE REF TO cl_salv_columns.
 
+  " Üretilen değişkene SALV nesnesinin kolonları atanır
+  lo_cols = go_salv->get_columns( ).
 
-"Genel Kolon işlemleri
-"Kolona erişmek için salv sınfıını kullanarak obje uretilir
-data lo_cols type REF TO cl_salv_columns.
+  " Kolonlar arası boşluğu optimize etme
+  lo_cols->set_optimize( VALUE = 'X' ).
 
-"uretilen degiskene bizim salv objemizin colonlarını verirzz
-lo_cols = GO_SALV->GET_COLUMNS( ).
+  " Tekli Kolon İşlemleri
+  " Kolona erişmek için SALV kütüphanesinden kolon değişkeni üretilir
+  DATA: lo_col TYPE REF TO cl_salv_column.
 
-"Kolonlar arası boşlugu optimize etmek
-lo_cols->SET_OPTIMIZE( VALUE = 'X' ).
+  " Kolonun kapladığı alanı değiştirme
+  " Değişkene kolonlara eriştiğimiz değişkenin get_column fonksiyonu ile bir kolon atanır
+  lo_col = lo_cols->get_column( COLUMNNAME = 'INVOICE' ).
 
+  lo_col->set_long_text( 'Changed column' ).
+  lo_col->set_medium_text( 'Changed cln' ).
+  lo_col->set_short_text( 'CHNGD CLN' ).
 
-"Tekli kolon işlemleri
-"kolona erişmek için salv kutuphanesinden kolon degiskeni uretilir
-data lo_col TYPE REF TO CL_SALV_COLUMN.
+  " İstenilen kolonu kaldırma
+  lo_col = lo_cols->get_column( COLUMNNAME = 'MANDT' ).
+  lo_col->set_visible( VALUE = '' ).
 
+  " Olası kolon bulunamama hatalarını engellemek için TRY-CATCH kullanılır
+  TRY.
+    lo_col = lo_cols->get_column( COLUMNNAME = 'herhangi bir kolon' ). " Kolon adı doğru girilmezse dump ekranına düşer, biz bunu TRY-CATCH ile engelliyoruz
+    lo_col->set_visible( VALUE = '' ).
+  CATCH cx_salv_not_found.
+    " Kolon bulunamadığında mesaj gösterilir
+    MESSAGE 'Column Not Found' TYPE 'I'.
+  ENDTRY.
 
+  " Toolbar Eklemek / Functions
+  " Toolbar'a erişmek için değişken oluşturulur
+  DATA: lo_toolbar TYPE REF TO cl_salv_functions.
 
-"Kolonun kapladıgı alanı degistirme"
-"degiskene colonlara eristigimiz degiskenin get column fonksionu ile bir colon atanir
-lo_col = lo_cols->GET_COLUMN( COLUMNNAME = 'INVOICE' ).
+  " Değişkene SALV nesnesinden gelen toolbar/functions değerlerini almak için fonksiyon çağırılır
+  lo_toolbar = go_salv->get_functions( ).
 
-LO_COL->SET_LONG_TEXT(' Changed colon ').
-LO_COL->SET_MEDIUM_TEXT(' Changed cln ').
-LO_COL->SET_SHORT_TEXT(' CHNGD CLN').
+  " Toolbar aktif edilir
+  lo_toolbar->set_all( VALUE = abap_true ).
 
-"istenilen kolonu kaldırma
-lo_col = lo_cols->GET_COLUMN( COLUMNNAME = 'MANDT' ).
-LO_COL->SET_VISIBLE( value = '' ).
+  " Başlık ve açıklama ekleme
+  " Başlık ve açıklamaları birleştirmek için değişkenler oluşturulur
+  DATA: lo_header TYPE REF TO cl_salv_form_layout_grid,
+        lo_h_label TYPE REF TO cl_salv_form_label,
+        lo_h_flow TYPE REF TO cl_salv_form_layout_flow.
 
-"Olası kolon bulunamama hatalarını engellemek için try catch kullanılır
-TRY .
-lo_col = lo_cols->GET_COLUMN( COLUMNNAME = 'herhangi bir kolon' ). "Kolon adı dogru girilmezse dump ekrnaına duşer biz bunu try catch ile engelliypruz
-LO_COL->SET_VISIBLE( value = '' ).
-CATCH CX_SALV_NOT_FOUND.
- "message 'Column Not Found' type 'I'.
-ENDTRY.
+  CREATE OBJECT lo_header. " Başlık objesi oluşturulur
 
+  " Başlık oluşturmak için label konumu belirlenir
+  lo_h_label = lo_header->create_label(
+    ROW    = 1
+    COLUMN = 1
+  ).
+  lo_h_label->set_text( VALUE = 'Oluşturulmuş başlık' ). " Başlık metni atanır
 
-"Toolbar Eklemek / functions
-"toolbara erişmek için degisken olusturulur
-data lo_toolbar type REF TO CL_SALV_FUNCTIONS.
+  " Açıklama metnini konumu ayarlanır
+  lo_h_flow = lo_header->create_flow(
+    ROW    = 2
+    COLUMN = 1
+  ).
 
-"degiskene bizim salv objesimzden gelen toolbar / functions degerlerini almak için fonksyon cagirirz
-lo_toolbar = GO_SALV->GET_FUNCTIONS( ).
+  lo_h_flow->create_text(
+    EXPORTING
+      TEXT = 'Bu bir açıklama'
+  ).
 
-"Toolbar aktif edilir
-LO_TOOLBAR->SET_ALL( abap_true ).
-"LO_TOOLBAR->SET_ALL( VALUE = abap_true ). bu veya
-" LO_TOOLBAR->SET_ALL( 'X' ). Bu şekilde de kullanilabilir
+  " Oluşturduğumuz başlık objesi SALV yapısına eklenir
+  go_salv->set_top_of_list( VALUE = lo_header ).
 
+  " ALV yapısını bir popup şekline çevirme
+  go_salv->set_screen_popup(
+    EXPORTING
+      start_column = 1 " Başlangıç kolonu
+      end_column   = 80 " Bitiş kolonu
+      start_line   = 1 " Başlangıç satırı
+      end_line     = 20 " Bitiş satırı
+  ).
 
-
-"Başlık ve açıklama ekleme
-"Başlık ve açıklamaları birleştirmek için degiskenler oluşturulur
-Data: lo_header TYPE REF TO CL_SALV_FORM_LAYOUT_GRID,
-      lo_h_label TYPE REF TO CL_SALV_FORM_LABEL,
-      lo_h_flow TYPE REF TO CL_SALV_FORM_LAYOUT_Flow.
-
-CREATE OBJECT lo_header. "Başlık objesi oluşturulur
-
-LO_H_LABEL = LO_HEADER->CREATE_LABEL( "Başlık oluşturmak için label konumu belirlenir
-               ROW         = 1
-               COLUMN      = 1
-             ).
-LO_H_LABEL->SET_TEXT( VALUE =  'Oluşturulmuş başlıka' ). "Başlık metni atanir
-
-LO_H_FLOW = LO_HEADER->CREATE_FLOW( "Açıklama metnini konumu ayarlanır
-              ROW     = 2
-              COLUMN  = 1 ).
-
-LO_H_FLOW->CREATE_TEXT( "Açıklama metni atanır
-EXPORTING
-    TEXT     =  'Bu bir açıklama'
-).
-
-go_salv->SET_TOP_OF_LIST( VALUE =  LO_HEADER ). "Oluşturdugumuz başlık objesi salv yapımıza eklenir
-
-
-
-"Alv yapısını bir popup şekline çevirme
-GO_SALV->SET_SCREEN_POPUP(
-  exporting
-    START_COLUMN = 1 "baş kolon
-    END_COLUMN   = 80 "bit kolon
-    START_LINE   = 1 "baş row
-    END_LINE     = 20 "bit row
-).
-
-GO_SALV->DISPLAY( ).
+  " SALV görüntülenir
+  go_salv->display( ).
