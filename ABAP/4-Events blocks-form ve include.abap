@@ -1,51 +1,53 @@
-Event blocks:program akışını duzene oturtmak için kullanılan keywordlerdir"İlk açılış vs. "Bir nevi yaşam dongusudur
+" Event blocks: Program akışını düzenlemek için kullanılan keywordlerdir.
+" İlk açılış, kullanıcı girişinden önce çalışacak kodlar gibi yaşam döngüsü bloklarıdır.
 
-1-initialization, //user input parametrelerinden once çalışmasını istediğimz kodlar
-2-at selection-screen,//input parametrelerini ozelleşitren yapı
-3-start-of-selection,//program run oldugunda çalışan kod
-4-end-of-selection,//formları kullancagımı yapı
+" 1. Initialization: User input parametrelerinden önce çalışmasını istediğimiz kodlar
+" 2. At selection-screen: Input parametrelerini özelleştiren yapı
+" 3. Start-of-selection: Program çalıştığında çalışan kod
+" 4. End-of-selection: Formları kullanacağımız yapı
 
+PARAMETERS: p_num TYPE i. " Parametre alan yapı oluşturur
 
-parameters: p_num type int4.//parametre alan yapı oluşturur
+INITIALIZATION.
+  " Input parametresi gelmeden önce çalışır, input içine değer atar
+  p_num = 12.
 
-initialization:  
-	"input parametresi gelmeden çalışır input içine degeri atar
-	p_num=12.
-	
-at selection-screen:	"input parametresine her girildiğinde çalışır
-	p_num = p_num + 1.
-	
-start-of-selection:	"rapor run edildigi gibi çalışır
-	write 'start of-selection'.
+AT SELECTION-SCREEN.
+  " Input parametresine her girildiğinde çalışır
+  p_num = p_num + 1.
 
-end-of-selection: 	"uygulama çalışma işlemi bitince çalışır
-	write 'end-of-selection'.
-	
-" Form	"Fonksiyon anlamına gelir
-data: gv_num1 type i.
-initialization.
+START-OF-SELECTION.
+  " Rapor çalıştırıldığında hemen çalışır
+  WRITE: 'Start of selection'.
 
-at selection-screen.
+END-OF-SELECTION.
+  " Uygulama çalışma işlemi bitince çalışır
+  WRITE: 'End of selection'.
 
-start-of-selection.
-	perform sayiya_bir_ekle. "daha sona forma(Fonksiona) erişmek isterek perform keywordu kullanılır
-	write gv_num1.
-	perform iki_sayiyi_carp usin 5
-								 5.
-end-of-selection.
+" Form: Fonksiyon anlamına gelir
+DATA: gv_num1 TYPE i.
 
+INITIALIZATION.
 
-"form oluşturma
-"form {formad} using {parametreler}vs. devam eder.
-form sayiya_bir_ekle.
-	gv_num1 = gv_num1 + 1.
-endform.
+AT SELECTION-SCREEN.
 
+START-OF-SELECTION.
+  PERFORM increment_number. " Daha sonra forma (fonksiyona) erişmek için perform keyword'ü kullanılır
+  WRITE: gv_num1.
+  PERFORM multiply_two_numbers USING 5 5.
+END-OF-SELECTION.
 
-"Parametre alan form(Fonksiyon)
-form iki_sayiyi_carp using p_num1,p_num2.
-	data lv_sonuc type i.
-	
-	lv_sonuc = P_num1 * p_num2.
-	
-	write lv_sonuc.
+" Form oluşturma
+" Form {form_name} USING {parameters} şeklinde devam eder
+FORM increment_number.
+  gv_num1 = gv_num1 + 1.
+ENDFORM.
+
+" Parametre alan form (Fonksiyon)
+FORM multiply_two_numbers USING p_num1 p_num2.
+  DATA: lv_result TYPE i.
+
+  lv_result = p_num1 * p_num2.
+
+  WRITE: lv_result.
+ENDFORM.
