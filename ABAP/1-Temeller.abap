@@ -1,134 +1,98 @@
-"VERİ tipi tanımlama
+" Data type definitions
+DATA gv_decimal TYPE p DECIMALS 3.   " Ondalık veri tipi, 3 ondalık basamak
+DATA gv_integer TYPE i.             " Tam sayı veri tipi (int4)
+DATA gv_numeric TYPE n LENGTH 3.   " Numerik veri tipi, 3 basamak
+DATA gv_char TYPE c LENGTH 1.      " Karakter veri tipi (1 karakter uzunluğunda)
+DATA gv_string TYPE string.        " String veri tipi
 
-data gv_degis type p decimals 3."decimals
-data gv_degis1 type int4 ." int2 / int1 integer
-data gv_gegis2 type n.  "numeric
-data gv_degis3 type c. "char
-data gv_degis4 type string.  "string
+" Assigning values to variables
+gv_decimal = '12,123'.   " Virgül ve 3 ondalık basamağı olan sayı
+gv_integer = 123.        " Tam sayı
+gv_numeric = '654'.      " Numerik veri tipi, 3 basamaklı
+gv_char = 'A'.          " Karakter veri tipi
+gv_string = 'selam furkan'. " String veri tipi
 
-"degiskenlere deger atama
-gv_degis = '12,123'. "virgulden sonra 3 karakter şeklinde kaydettik "decimals
+DATA gv_numeric10 TYPE n LENGTH 10. " 10 basamaklı sayıyı temsil eder
 
-gv_degis1 = 123.  "integer
-gv_degis2 = 654.  "numeric type integer gibi numerik ifade alır tanımlamalarda lenght uzunlguu verirsek uzunlguu kadar başına 0 degeri koyar ve boş bırakır
+" Defining multiple data variables
+DATA: gv_var1 TYPE i,
+      gv_var2 TYPE n,
+      gv_var3 TYPE string.
 
-gv_degis3 = 'A'. "char 
-gv_degis4= 'selam furkan'. "String 
+" Comment lines
+" selam
+* selam *
 
+" Printing output
+WRITE: / 'Text to print'. " Yeni satıra geçerek yazdırır
 
+" Using IF statements
+IF gv_numeric > 5.
+  WRITE: / 'Variable is greater than 5', gv_numeric.
+ENDIF.
 
-data gv_gegis5 type i. "int4 anlamına gelir 10 basamaklı bir sayı tutar
+DATA gv_variable TYPE i VALUE 10.
 
-data gv_degis6 type n length 10. "sadece n yazıp bıraksak bu 1 karakterli sayıya tekabul eder length 10 diyerek 10 basamaklı bir sayı tutcagımı soluyoruz
+IF gv_variable < 10.
+  WRITE: / 'Variable is less than 10'.
+ELSEIF gv_variable > 10.
+  WRITE: / 'Variable is greater than 10'.
+ELSE.
+  WRITE: / 'Variable is 10'.
+ENDIF.
 
-"data yazıp iki nokta koymamzı durumunda biz birden cok data tamılayacgımız anlamına gelir
-data: gv_degis type i,
-	gv_degis1 type n,
-	gv_degis2 type string.
-	
-	
-"Yorum satırı
-"selam" 
-*selam*
+DATA: gv_num1 TYPE i VALUE 2,
+      gv_num2 TYPE i VALUE 2.
 
-"write degis_ad "şeklinde çıktı alınır
-write: ile birden cok yazdırma işlemi yapılır
+IF gv_num1 = 1. " Eşittir
+  WRITE: / 'Your value is 1'.
+ELSEIF gv_num1 = gv_num2.
+  WRITE: / 'Your value is 2'.
+ELSE.
+  WRITE: / 'Your value is neither 1 nor 2'.
+ENDIF.
 
-"if kullanımı
-if koşul.
+" CASE WHEN structure
+DATA gv_case TYPE i VALUE 1.
 
-endif.
+CASE gv_case.
+  WHEN 1.
+    WRITE: / 'Number 1'.
+  WHEN 2.
+    WRITE: / 'Number 2'.
+  WHEN 3.
+    WRITE: / 'Number 3'.
+  WHEN OTHERS.
+    WRITE: / 'Number is neither 1, 2, nor 3'.
+ENDCASE.
 
-"ornek
+" DO loop
+DATA: gv_name TYPE string VALUE 'Furkan',
+     gv_length TYPE i.
 
-if gv_degis2 > 5.
-    write: 'degisken 5 ten buyuktur',gv_degis2.
-endif.
+gv_length = strlen(gv_name).
 
+DO gv_length TIMES.
+  WRITE: / 'Furkan'.
+ENDDO.
 
-data:gv_degis2 type i value 10.       
+DATA gv_counter TYPE i VALUE 0.
 
+DO 20 TIMES.
+  WRITE: / 'Current number: ', gv_counter.  " Yeni satıra geçer
+  gv_counter = gv_counter + 1.
+ENDDO.
 
-if gv_degis2 < 10.
-    write 'degisken 10 dan kucuktur'.
-elseif gv_degis2 > 10.
-    write 'degisken 10 dan buyuktur'. 
-else.
-    write 'degisken 10'.
-endif.
+" WHILE loop
 
-data: gv_s1 type i value 2 , gv_s2 type i value 2.
-if gv_s1 = 1."eşittir
-    write 'senin sayın 1'.
-elseif gv_s1 = gv_s2.
-    write 'senin sayın 2'.
-else.
-    write 'senin sayın 2 veya 1 degil'. 
-endif.
+WHILE gv_counter > 0. " Şart sağlandığı sürece çalışır
+  WRITE: / 'NUMBER: ', gv_counter.
+  gv_counter = gv_counter - 1.
+ENDWHILE.
 
-
-
-"CASE WHEN yapısı
-
-data gv_s1 type i value 1.
-
-case gv_s1.
-    when 1.
-        write 'Rakam 1'.
-    when 2.
-        write 'Rakam 2'.
-    when 3.
-        write 'Rakam 3'.
-    when others.
-        write 'Ralam ne 1 ne 2 ne 3'.
-endcase.    
-    
-	
-"DO DONGUSU
-
-data gv_s1 type i value 0.
-
-do 10 times. "Dongu 10 defa doner
-    write 'SJ'.
-enddo.
-
-data: gv_adim type string value 'Furkan' , gv_adUzunluk type i.
-gv_adUzunluk = STRLEN(gv_adim).
-
-do gv_adUzunluk times.
-    write 'furkan'.
-enddo.
-
-
-data gv_degs type i value 0.
-
-do 20 times.
-write: / 'Sayı şuan: ',gv_degs.  "baştaki / altsatıra indirir
-gv_degs = gv_degs + 1 .
-
-enddo.
-
-
-WHILE DONGUSU
-
-data gv_degs type i value 1.
-
-while gv_degs > 0. "şart uydugu surece çalısır"
-    write 'SJ'.
-endwhile.
-
-
-data gv_degs type i value 10.
-
-while gv_degs > 0. "şart uydugu surece çalısır"
-    write: / 'SAYI: ',gv_degs.
-    gv_degs = gv_degs - 1.
-endwhile.
-
-
-" < LT. 
-" > GT. 
-" <= LE.
-" >= GE.
-" = EQ.
-"Şeklinde de kullanılır
+" Comparison operators
+" < LT  : Less than
+" > GT  : Greater than
+" <= LE : Less than or equal to
+" >= GE : Greater than or equal to
+" = EQ  : Equal to
