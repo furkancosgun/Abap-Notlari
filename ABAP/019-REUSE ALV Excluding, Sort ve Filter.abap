@@ -45,9 +45,6 @@ FORM apply_exclude_sort_filter.
   CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
     EXPORTING
       I_CALLBACK_PROGRAM = sy-repid " Callback fonksiyonlarının bulunduğu program
-      * I_CALLBACK_PF_STATUS_SET = 'PF_STATUS_SET' " Status bar ayarları (isteğe bağlı)
-      I_CALLBACK_USER_COMMAND = 'USER_COMMAND' " Kullanıcı komutları fonksiyonu
-      I_CALLBACK_TOP_OF_PAGE = 'TOP_OF_PAGE' " Sayfa başlığı ve açıklama fonksiyonu
       IS_LAYOUT = gs_layout " Layout ayarları
       IT_FIELDCAT = gt_fieldcalatog " Field catalog (Tablo kolonları)
       IT_EXCLUDING = gt_exclude " Status bardan çıkarılacak işlemler
